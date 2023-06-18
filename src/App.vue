@@ -1,13 +1,21 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+  <div id="app" class="relative bg-yellow-50 overflow-hidden">
+    <Sidebar />
+    <main class="ml-60 bg-yellow-50 overflow-auto min-h-screen">
+      <router-view />
+    </main>
   </div>
 </template>
+<script>
+import Sidebar from "@/components/Sidebar.vue";
 
+export default {
+  name: "App",
+  components: {
+    Sidebar,
+  },
+};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
