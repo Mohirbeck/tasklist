@@ -40,7 +40,7 @@
               <p class="text-sm font-semibold leading-6 text-gray-900">
                 {{ task.title }}
               </p>
-              <p
+              <button
                 class="rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset"
                 :class="
                   task.status === 1
@@ -49,6 +49,7 @@
                     ? 'text-gray-600 bg-gray-50 ring-gray-500/10'
                     : 'text-yellow-800 bg-yellow-50 ring-yellow-600/20'
                 "
+                @click="ChangeStatus(task)"
               >
                 {{
                   task.status === 1
@@ -57,7 +58,15 @@
                     ? "In progress"
                     : "Archived"
                 }}
-              </p>
+              </button>
+              <button
+                class="rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset"
+                v-if="show_undo === task.id"
+                @click="Undo(task)"
+              >
+                Undo
+                {{ undo_counter }}
+              </button>
             </div>
             <div
               class="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500"
@@ -129,6 +138,7 @@
                 <button
                   class="block px-3 py-1 text-sm leading-6 text-red-500 w-full"
                   role="menuitem"
+                  @click="deleteTask(task)"
                 >
                   Delete
                 </button>
@@ -253,6 +263,8 @@ export default {
   data() {
     return {
       open: -1,
+      show_undo: 0,
+      undo_counter: 5,
       dialog: false,
       task: {
         title: "",
@@ -286,6 +298,28 @@ export default {
       };
       this.dialog = false;
     },
+    ChangeStatus(task) {
+      if (task.status !== 3) {
+        this.show_undo = 0;
+        this.$store.dispatch("changeStatus", task);
+        this.show_undo = task.id;
+        this.undo_counter = 5;
+        setInterval(() => {
+          if (this.show_undo === task.id) {
+            this.undo_counter--;
+          }
+        }, 1000);
+        setTimeout(() => {
+          if (this.show_undo === task.id) {
+            this.show_undo = 0;
+          }
+        }, 5000);
+      }
+    },
+    Undo(task) {
+      this.$store.dispatch("revertStatus", task);
+      this.show_undo = 0;
+    },
     saveTask() {
       if (this.open === -1) {
         this.task.id = this.tasks[this.tasks.length - 1].id + 1;
@@ -295,6 +329,9 @@ export default {
       } else {
         this.$store.dispatch("editTask", this.task);
       }
+    },
+    deleteTask(task) {
+      this.$store.dispatch("deleteTask", task);
     },
   },
   filters: {

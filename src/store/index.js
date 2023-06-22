@@ -24,6 +24,37 @@ export default new Vuex.Store({
         }
         return t
       })
+    },
+    changeStatus(state, task) {
+      state.tasks.forEach(t => {
+        if (t.id === task.id) {
+          switch (t.status) {
+            case 1:
+              t.status = 3
+              break;
+            case 2:
+              t.status = 1
+              break;
+          }
+        }
+      })
+    },
+    revertStatus(state, task) {
+      state.tasks.forEach(t => {
+        if (t.id === task.id) {
+          switch (t.status) {
+            case 3:
+              t.status = 1
+              break;
+            case 1:
+              t.status = 2
+              break;
+          }
+        }
+      })
+    },
+    deleteTask(state, task) {
+      state.tasks = state.tasks.filter(t => t.id !== task.id)
     }
   },
   actions: {
@@ -32,6 +63,15 @@ export default new Vuex.Store({
     },
     editTask({ commit }, task) {
       commit('editTask', task)
+    },
+    changeStatus({ commit }, task) {
+      commit('changeStatus', task)
+    },
+    revertStatus({ commit }, task) {
+      commit('revertStatus', task)
+    },
+    deleteTask({ commit }, task) {
+      commit('deleteTask', task)
     }
   },
   modules: {
